@@ -51,15 +51,42 @@ export default function Profile() {
       {msg   && <div className="alert alert-success">{msg}</div>}
       {error && <div className="alert alert-error">{error}</div>}
 
+      <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginBottom: '1.5rem' }}>
+        <div style={{
+          width: '56px', height: '56px', borderRadius: '50%',
+          background: 'linear-gradient(135deg, #4F46E5, #818CF8)',
+          color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: '1.4rem', fontWeight: '800', flexShrink: 0
+        }}>
+          {profile?.fullName?.charAt(0)?.toUpperCase() || 'U'}
+        </div>
+        <div>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-primary)', margin: 0 }}>
+            {profile?.fullName || 'User Profile'}
+          </h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+            <span style={{ fontSize: '0.84rem', color: 'var(--text-secondary)' }}>{profile?.email}</span>
+            <span className="badge badge-green">DPDPA Principal</span>
+          </div>
+        </div>
+      </div>
+
       <div className="card">
-        <h3>Personal Information</h3>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.6rem' }}>
+          <h3 style={{ margin: 0, border: 'none', padding: 0 }}>Personal Information</h3>
+          {!editing && (
+            <button className="btn btn-secondary btn-sm" onClick={() => setEditing(true)}>
+              ✏️ Edit Details
+            </button>
+          )}
+        </div>
         {!editing ? (
           <>
             <div className="profile-info">
               {[
                 ['Full Name',    profile?.fullName],
-                ['Email',        profile?.email],
-                ['Mobile',       profile?.mobileNumber ? `${profile.mobileNumber.slice(0,3)}****${profile.mobileNumber.slice(-3)}` : '-'],
+                ['Email Address',profile?.email],
+                ['Mobile Number',profile?.mobileNumber ? `${profile.mobileNumber.slice(0,3)}****${profile.mobileNumber.slice(-3)}` : '-'],
                 ['Date of Birth',profile?.dateOfBirth?.slice(0,10) || '-'],
                 ['Gender',       profile?.gender || '-'],
                 ['City',         profile?.city || '-'],
@@ -71,9 +98,6 @@ export default function Profile() {
                   <p>{val || '-'}</p>
                 </div>
               ))}
-            </div>
-            <div style={{ marginTop: '1.2rem' }}>
-              <button className="btn btn-secondary btn-sm" onClick={() => setEditing(true)}>Edit Profile</button>
             </div>
           </>
         ) : (

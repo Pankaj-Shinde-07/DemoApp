@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, NavLink, Link } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Register   from './pages/Register';
 import Login      from './pages/Login';
@@ -28,22 +28,25 @@ function Navbar() {
   const { user, logout } = useAuth();
   return (
     <nav className="navbar">
-      <span className="navbar-brand">🛡️ DemoApp</span>
+      <Link to="/" className="navbar-brand">
+        <span>🛡️ DemoApp</span>
+        <span className="navbar-brand-badge">DPDPA Target</span>
+      </Link>
       {user ? (
         <div className="navbar-links">
-          <Link to="/profile">Profile</Link>
-          <Link to="/products">Products</Link>
-          <Link to="/orders">Orders</Link>
-          <Link to="/consents">Consents</Link>
-          <Link to="/privacy-rights">My Rights</Link>
-          <Link to="/privacy-policy" style={{ opacity: 0.85 }}>Privacy Notice</Link>
+          <NavLink to="/profile" className={({ isActive }) => isActive ? 'active' : ''}>Profile</NavLink>
+          <NavLink to="/products" className={({ isActive }) => isActive ? 'active' : ''}>Products</NavLink>
+          <NavLink to="/orders" className={({ isActive }) => isActive ? 'active' : ''}>Orders</NavLink>
+          <NavLink to="/consents" className={({ isActive }) => isActive ? 'active' : ''}>Consents</NavLink>
+          <NavLink to="/privacy-rights" className={({ isActive }) => isActive ? 'active' : ''}>My Rights</NavLink>
+          <NavLink to="/privacy-policy" className={({ isActive }) => isActive ? 'active' : ''}>Privacy Notice</NavLink>
           <button onClick={logout} className="btn-logout">Logout</button>
         </div>
       ) : (
         <div className="navbar-links">
-          <Link to="/login">Login</Link>
-          <Link to="/register">Register</Link>
-          <Link to="/privacy-policy" style={{ opacity: 0.85 }}>Privacy Notice</Link>
+          <NavLink to="/login" className={({ isActive }) => isActive ? 'active' : ''}>Login</NavLink>
+          <NavLink to="/register" className={({ isActive }) => isActive ? 'active' : ''}>Register</NavLink>
+          <NavLink to="/privacy-policy" className={({ isActive }) => isActive ? 'active' : ''}>Privacy Notice</NavLink>
         </div>
       )}
     </nav>
