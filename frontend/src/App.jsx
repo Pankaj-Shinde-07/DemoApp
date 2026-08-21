@@ -11,6 +11,7 @@ import AdminLogin    from './pages/AdminLogin';
 import AdminPanel    from './pages/AdminPanel';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import PrivacyRights from './pages/PrivacyRights';
+import PrivacyBanner from './components/PrivacyBanner';
 import './App.css';
 
 function ProtectedRoute({ children }) {
@@ -54,6 +55,7 @@ function App() {
     <AuthProvider>
       <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Navbar />
+        <PrivacyBanner />
         <div className="main-content">
           <Routes>
             <Route path="/register"    element={<Register />} />

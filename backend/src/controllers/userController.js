@@ -31,14 +31,32 @@ const register = async (req, res) => {
 
         const userId = result.insertId;
 
-        // Default consents
+        // Dynamic statutory consents based on user acceptance / rejection
+        const { consents: userConsents = {} } = req.body;
         const purposes = ['ACCOUNT_SERVICE', 'SERVICE_COMMUNICATION', 'MARKETING', 'ANALYTICS'];
         for (const purpose of purposes) {
-            const status = (purpose === 'ACCOUNT_SERVICE' || purpose === 'SERVICE_COMMUNICATION') ? 'GRANTED' : 'PENDING';
+            let status = 'WITHDRAWN';
+            if (purpose === 'ACCOUNT_SERVICE') {
+                status = 'GRANTED';
+            } else if (purpose === 'SERVICE_COMMUNICATION') {
+                status = userConsents.SERVICE_COMMUNICATION !== false ? 'GRANTED' : 'WITHDRAWN';
+            } else if (purpose === 'MARKETING') {
+                status = userConsents.MARKETING === true ? 'GRANTED' : 'WITHDRAWN';
+            } else if (purpose === 'ANALYTICS') {
+                status = userConsents.ANALYTICS === true ? 'GRANTED' : 'WITHDRAWN';
+            }
+
             const grantedAt = status === 'GRANTED' ? new Date() : null;
+            const withdrawnAt = status === 'WITHDRAWN' ? new Date() : null;
+            const [consentRes] = await pool.execute(
+                `INSERT INTO consents (userId, purpose, status, source, grantedAt, withdrawnAt) VALUES (?, ?, ?, ?, ?, ?)`,
+                [userId, purpose, status, 'user_registration', grantedAt, withdrawnAt]
+            );
+
             await pool.execute(
-                `INSERT INTO consents (userId, purpose, status, source, grantedAt) VALUES (?, ?, ?, ?, ?)`,
-                [userId, purpose, status, 'user_registration', grantedAt]
+                `INSERT INTO consent_history (userId, consentId, purpose, action, previousStatus, newStatus, source, ipAddress, userAgent)
+                 VALUES (?, ?, ?, ?, NULL, ?, 'user_registration', ?, ?)`,
+                [userId, consentRes.insertId, purpose, status, status, ip, ua]
             );
         }
 
