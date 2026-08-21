@@ -1,0 +1,104 @@
+{
+  "application": "DemoApp",
+  "version": "1.0.0",
+  "lastUpdated": "2025-01-01",
+  "note": "This data inventory is intentionally incomplete. Some fields are used beyond their declared purpose. The external DPDPA Audit Platform should detect these discrepancies.",
+  "dataFields": [
+    {
+      "field": "fullName",
+      "category": "personal_data",
+      "declaredPurpose": "Account creation and identification",
+      "declaredRetentionDays": 730,
+      "source": "user_registration",
+      "thirdPartySharing": false
+    },
+    {
+      "field": "email",
+      "category": "personal_data",
+      "declaredPurpose": "Login and account communication",
+      "declaredRetentionDays": 730,
+      "source": "user_registration",
+      "thirdPartySharing": false
+    },
+    {
+      "field": "mobileNumber",
+      "category": "personal_data",
+      "declaredPurpose": "OTP verification only",
+      "declaredRetentionDays": 730,
+      "source": "user_registration",
+      "thirdPartySharing": false,
+      "note": "INTENTIONAL_DISCREPANCY: Declared purpose is OTP verification only. Observed usage includes login events, order processing events, and application logs. External DPDPA Audit Platform should flag PURPOSE_MISMATCH."
+    },
+    {
+      "field": "dateOfBirth",
+      "category": "personal_data",
+      "declaredPurpose": "Age verification",
+      "declaredRetentionDays": 730,
+      "source": "user_registration",
+      "thirdPartySharing": false
+    },
+    {
+      "field": "address",
+      "category": "personal_data",
+      "declaredPurpose": "Service delivery and shipping",
+      "declaredRetentionDays": 730,
+      "source": "user_registration",
+      "thirdPartySharing": false
+    },
+    {
+      "field": "gender",
+      "category": "personal_data",
+      "declaredPurpose": "Personalisation",
+      "declaredRetentionDays": 730,
+      "source": "user_registration",
+      "thirdPartySharing": false
+    },
+    {
+      "field": "ipAddress",
+      "category": "technical_data",
+      "declaredPurpose": "Security and fraud prevention",
+      "declaredRetentionDays": 90,
+      "source": "application_events",
+      "thirdPartySharing": false
+    },
+    {
+      "field": "userAgent",
+      "category": "technical_data",
+      "declaredPurpose": "Security and compatibility",
+      "declaredRetentionDays": 90,
+      "source": "application_events",
+      "thirdPartySharing": false
+    },
+    {
+      "field": "consentRecord",
+      "category": "consent_data",
+      "declaredPurpose": "Consent management and audit",
+      "declaredRetentionDays": 1825,
+      "source": "consent_management",
+      "thirdPartySharing": false
+    },
+    {
+      "field": "orderData",
+      "category": "transactional_data",
+      "declaredPurpose": "Order fulfilment",
+      "declaredRetentionDays": 2555,
+      "source": "order_management",
+      "thirdPartySharing": false
+    },
+    {
+      "field": "marketingData",
+      "category": "marketing_data",
+      "declaredPurpose": "Marketing communications (consent-based)",
+      "declaredRetentionDays": 365,
+      "source": "consent_management",
+      "thirdPartySharing": false,
+      "note": "INTENTIONAL_DISCREPANCY: Declared retention is 365 days. Seed data contains a MARKETING_PROCESSING event older than 365 days. External DPDPA Audit Platform should flag RETENTION_PERIOD_EXCEEDED."
+    }
+  ],
+  "consentPurposes": [
+    { "purpose": "ACCOUNT_SERVICE",       "lawfulBasis": "Contract",         "mandatory": true  },
+    { "purpose": "SERVICE_COMMUNICATION", "lawfulBasis": "Legitimate Interest","mandatory": false },
+    { "purpose": "MARKETING",             "lawfulBasis": "Consent",           "mandatory": false },
+    { "purpose": "ANALYTICS",             "lawfulBasis": "Consent",           "mandatory": false }
+  ]
+}
