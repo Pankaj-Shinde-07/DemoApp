@@ -25,7 +25,8 @@ const emitEvent = async ({ eventType, userId = null, dataFields = [], purpose = 
         );
         // Stream to PrivGuard auditor backend if active (fire-and-forget)
         try {
-            fetch('http://localhost:5000/api/events', {
+            const privguardUrl = (process.env.PRIVGUARD_URL || 'http://localhost:5000').replace(/\/$/, '');
+            fetch(`${privguardUrl}/api/events`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

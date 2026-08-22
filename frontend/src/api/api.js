@@ -1,4 +1,5 @@
-const BASE = '/api';
+const API_ORIGIN = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+const BASE = API_ORIGIN ? `${API_ORIGIN}/api` : '/api';
 
 export const apiRequest = async (endpoint, method = 'GET', body = null, token = null) => {
   const headers = { 'Content-Type': 'application/json' };
@@ -7,8 +8,9 @@ export const apiRequest = async (endpoint, method = 'GET', body = null, token = 
   const opts = { method, headers };
   if (body) opts.body = JSON.stringify(body);
 
-  const res = await fetch(`${BASE}${endpoint}`, opts);
-  const data = await res.json();
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  const res = await fetch(`${BASE}${cleanEndpoint}`, opts);
+  const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.message || 'Request failed');
   return data;
 };

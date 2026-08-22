@@ -1,246 +1,254 @@
-# DemoApp
+# 📱 DemoApp — Simulated Organization Application for DPDPA Compliance Auditing
 
-**Simulated Organization Application for DPDPA Compliance Testing**
-
----
-
-## 1. Project Overview
-
-DemoApp is a realistic simulated organization web application built specifically as the **target environment** for an external DPDPA Compliance & Personal Data Risk Assessment Platform.
-
-DemoApp behaves like a real organization's application — it collects personal data, processes it, generates logs, emits consent events, and stores records in a MySQL database. It also contains a controlled set of intentional DPDPA compliance test scenarios so the external audit platform can demonstrate detection capability.
+> **DemoApp** is a realistic e-commerce and identity management web application designed specifically as the **target environment** to demonstrate real-time auditing and risk assessment with the **PrivGuard DPDPA Compliance Platform**.
 
 ---
 
-## 2. Important Architecture: DemoApp vs DPDPA Audit Platform
+## 1. Overview & Architecture
+
+DemoApp simulates a full enterprise service (Data Fiduciary) collecting and processing personal data under the **Digital Personal Data Protection Act (DPDPA) 2023** and **DPDP Rules 2025**.
 
 ```
-┌──────────────────────────────────────┐
-│              DemoApp                 │
-│  Simulated Organization Application  │
-│                                      │
-│  Generates: users, logs, API events, │
-│  consent events, database records    │
-└──────────────────┬───────────────────┘
-                   │ Evidence
-                   ▼
-┌──────────────────────────────────────┐
-│      DPDPA AUDIT PLATFORM            │
-│        (SEPARATE PROJECT)            │
-│  Analyzes DemoApp's behavior and     │
-│  detects potential compliance risks  │
-└──────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────┐
+│              DemoApp (Target Client Application)          │
+│              Port: 5001 (Backend) | Port: 5174 (Frontend) │
+│                                                           │
+│  • User Registration & OTP Auth                           │
+│  • Consent Management Lifecycle                           │
+│  • E-Commerce Orders & Shipping Address                   │
+│  • Intentional Test Scenarios (TEST-001 to TEST-007)      │
+│  • DPDPA Statutory Audit Feeds (/api/audit-feed/*)        │
+└─────────────────────────────┬─────────────────────────────┘
+                              │
+               1. Live Async  │  2. Statutory Audit Feeds
+               Telemetry      │  (/api/audit-feed/evidence)
+                              ▼
+┌───────────────────────────────────────────────────────────┐
+│               PrivGuard Auditor Platform (Port 5000)       │
+│                                                           │
+│  • Real-Time PII & Breach Detector                        │
+│  • DPDPA Policy Engine (POL-001 to POL-006)               │
+│  • Statutory Compliance Score Calculator                  │
+│  • Audit Report PDF Generator                             │
+└───────────────────────────────────────────────────────────┘
 ```
 
-**DemoApp is NOT the auditing solution. It is the target being audited.**
+> **Note**: DemoApp is the target application being audited; PrivGuard is the autonomous auditing platform.
 
 ---
 
-## 3. Why DemoApp Exists
+## 2. Technology Stack
 
-The external DPDPA Audit Platform needs a realistic target to audit. DemoApp provides:
-- Real user registration, login, and profile workflows
-- Consent grant/withdrawal events
-- Data processing events for every personal-data operation
-- Application logs (including intentional PII exposure)
-- MySQL database with personal data
-- REST APIs (including intentional excessive data exposure)
-- Controlled DPDPA test scenarios with deterministic evidence
-
----
-
-## 4. Technology Stack
-
-| Layer    | Technology                        |
-|----------|-----------------------------------|
-| Frontend | React 19, Vite, React Router DOM  |
-| Backend  | Node.js, Express.js               |
-| Database | MySQL                             |
-| Auth     | JWT (jsonwebtoken)                |
-| Logging  | Winston + MySQL audit table       |
-| API Docs | Swagger UI (swagger-jsdoc)        |
+| Layer | Technology |
+|---|---|
+| **Frontend** | React 19, Vite, React Router DOM, Vanilla CSS |
+| **Backend** | Node.js, Express.js |
+| **Database** | MySQL (Railway Cloud / Local MySQL 8) |
+| **Authentication** | JWT (jsonwebtoken) + bcrypt |
+| **Logging** | Structured audit logs (MySQL + file storage) |
+| **API Documentation**| Swagger UI (`http://localhost:5001/api-docs`) |
+| **Auditor Integration** | Async Telemetry Stream & DPDPA Statutory Feeds |
 
 ---
 
-## 5. Architecture
+## 3. Directory Structure
 
 ```
 DemoApp/
 ├── backend/
 │   ├── src/
-│   │   ├── controllers/     # userController, consentController, productOrderController, adminController
-│   │   ├── routes/          # userRoutes, consentRoutes, productOrderRoutes, adminRoutes
-│   │   ├── models/          # db.js (MySQL pool)
-│   │   ├── middleware/      # authMiddleware, adminMiddleware
-│   │   ├── events/          # eventEmitter.js
-│   │   ├── utils/           # logger.js, swagger.js
-│   │   └── server.js
+│   │   ├── controllers/      # userController, consentController, auditFeedController, productOrderController
+│   │   ├── routes/           # userRoutes, consentRoutes, auditFeedRoutes, productOrderRoutes, adminRoutes
+│   │   ├── models/           # db.js (MySQL pool)
+│   │   ├── middleware/       # authMiddleware, adminMiddleware
+│   │   ├── events/           # eventEmitter.js (streams to PrivGuard via PRIVGUARD_URL)
+│   │   ├── utils/            # logger.js, swagger.js
+│   │   └── server.js         # Entry point (Port 5001)
 │   ├── database/
 │   │   ├── schema.sql
 │   │   └── seed.sql
 │   └── package.json
+│
 ├── frontend/
+│   ├── vercel.json           # SPA routing rewrite configuration for Vercel
 │   ├── src/
-│   │   ├── pages/           # Register, Login, Profile, Products, Orders, Consents, Deletion, AdminLogin, AdminPanel
-│   │   ├── context/         # AuthContext
-│   │   ├── api/             # api.js
+│   │   ├── pages/            # Register, Login, Profile, Products, Orders, Consents, Deletion, AdminPanel
+│   │   ├── context/          # AuthContext
+│   │   ├── api/              # api.js (Dynamic VITE_API_URL resolution)
 │   │   └── App.jsx
 │   └── package.json
+│
 ├── docs/
-│   ├── data-inventory.json
+│   ├── data-inventory.json   # Declared Data Inventory (Layer 1 Evidence)
 │   └── intentional-dpdpa-test-scenarios.md
 └── README.md
 ```
 
 ---
 
-## 6. Database Architecture
+## ☁️ Cloud Deployment Guide (Render & Vercel)
 
-| Table                    | Purpose                                              |
-|--------------------------|------------------------------------------------------|
-| users                    | User personal data                                   |
-| admin_users              | Admin accounts                                       |
-| consents                 | Current consent status per user per purpose          |
-| consent_history          | Full audit trail of consent changes                  |
-| products                 | Products/services catalogue                          |
-| orders                   | User orders                                          |
-| order_items              | Line items per order                                 |
-| user_addresses           | Saved addresses                                      |
-| data_processing_events   | Structured events for every personal-data operation  |
-| application_audit_logs   | Application-level audit trail (includes PII test)    |
-| data_deletion_requests   | User data deletion requests                          |
+DemoApp is configured for easy split deployment: **Backend on Render** and **Frontend on Vercel**.
 
----
-
-## 7. API Endpoints
-
-| Method | Endpoint                          | Description                                    |
-|--------|-----------------------------------|------------------------------------------------|
-| POST   | /api/users/register               | Register user (triggers PII log test case)     |
-| POST   | /api/users/login                  | Login, returns JWT                             |
-| GET    | /api/users/:id                    | Get profile (intentional excessive data)       |
-| PUT    | /api/users/:id                    | Update profile                                 |
-| GET    | /api/users/:id/events             | Get user's data processing events              |
-| POST   | /api/users/:id/deletion-request   | Submit data deletion request                   |
-| GET    | /api/products                     | List products                                  |
-| GET    | /api/products/:id                 | Get product                                    |
-| POST   | /api/orders                       | Create order (triggers purpose mismatch)       |
-| GET    | /api/orders/:id                   | Get order                                      |
-| GET    | /api/consents/:userId             | Get user consents                              |
-| POST   | /api/consents                     | Grant consent                                  |
-| POST   | /api/consents/:id/withdraw        | Withdraw consent (triggers enforcement test)   |
-| POST   | /api/admin/login                  | Admin login                                    |
-| GET    | /api/admin/users                  | Admin: list users                              |
-| GET    | /api/admin/orders                 | Admin: list orders                             |
-| GET    | /api/admin/consents               | Admin: list consents                           |
-| GET    | /api/admin/events                 | Admin: list processing events                  |
-| GET    | /api/admin/audit-logs             | Admin: list audit logs                         |
-| GET    | /api/admin/deletion-requests      | Admin: list deletion requests                  |
-
-Swagger UI: `http://localhost:5001/api-docs`
+```
+┌────────────────────────────────────────────────────────┐
+│               Frontend on VERCEL                       │
+│    URL: https://demoapp-portal.vercel.app              │
+│    Config: VITE_API_URL=https://demoapp.onrender.com   │
+└───────────────────────────┬────────────────────────────┘
+                            │ HTTPS
+                            ▼
+┌────────────────────────────────────────────────────────┐
+│               Backend on RENDER                        │
+│    URL: https://demoapp.onrender.com                   │
+│    Database: MySQL (Railway / AWS RDS / Local)         │
+│    Auditor: PRIVGUARD_URL=https://privguard.onrender   │
+└────────────────────────────────────────────────────────┘
+```
 
 ---
 
-## 8. Intentional DPDPA Test Scenarios
+### Step 1: Deploy Backend on Render
 
-See `docs/intentional-dpdpa-test-scenarios.md` for full details.
+1. Go to [Render Dashboard](https://dashboard.render.com/) & click **New + &rarr; Web Service**.
+2. Connect your Git repository.
+3. Configure the service settings:
+   * **Name**: `demoapp-backend`
+   * **Root Directory**: `DemoApp/backend` (or `backend` if repo root is `DemoApp`)
+   * **Environment**: `Node`
+   * **Region**: Choose the closest region (e.g. `Singapore` or `Frankfurt`)
+   * **Branch**: `main`
+   * **Build Command**: `npm install`
+   * **Start Command**: `npm start`
+4. Add the following **Environment Variables** in Render:
 
-| Test    | Scenario                        | Rule     | Severity |
-|---------|---------------------------------|----------|----------|
-| TEST-001| PII in application logs         | RULE-001 | HIGH     |
-| TEST-002| Excessive API data exposure     | RULE-006 | HIGH     |
-| TEST-003| Consent enforcement failure     | RULE-005 | CRITICAL |
-| TEST-004| Purpose-use mismatch (mobile)   | RULE-003 | HIGH     |
-| TEST-005| Retention period exceeded       | RULE-007 | MEDIUM   |
+| Variable Name | Example Value | Description |
+|---|---|---|
+| `PORT` | `5001` | Server port (*Render injects this*) |
+| `DATABASE_HOST` | `ballast.proxy.rlwy.net` | MySQL Host |
+| `DATABASE_PORT` | `30390` | MySQL Port |
+| `DATABASE_NAME` | `railway` | Database Name |
+| `DATABASE_USER` | `root` | Database Username |
+| `DATABASE_PASSWORD` | `your_mysql_password` | Database Password |
+| `JWT_SECRET_KEY` | `demoapp_production_secret` | JWT Signing Key |
+| `PRIVGUARD_URL` | `https://privguard-backend.onrender.com` | Deployed PrivGuard backend URL for telemetry |
+
+5. Click **Create Web Service**. Once deployed, copy your Render URL (e.g. `https://demoapp-backend.onrender.com`).
 
 ---
 
-## 9. Setup Instructions
+### Step 2: Deploy Frontend on Vercel
+
+1. Go to [Vercel Dashboard](https://vercel.com/) & click **Add New... &rarr; Project**.
+2. Import your Git repository.
+3. Configure the project:
+   * **Framework Preset**: `Vite`
+   * **Root Directory**: Click *Edit* and choose `DemoApp/frontend` (or `frontend`)
+   * **Build Command**: `npm run build`
+   * **Output Directory**: `dist`
+   * **Install Command**: `npm install`
+4. Expand **Environment Variables** and add:
+
+| Key | Value | Description |
+|---|---|---|
+| `VITE_API_URL` | `https://demoapp-backend.onrender.com` | Your live Render backend URL (no trailing slash) |
+
+5. Click **Deploy**.
+6. SPA routing (e.g. `/profile`, `/consents`, `/admin`) is handled automatically by `vercel.json`.
+
+---
+
+## 4. DPDPA Statutory Audit Feeds (Consumed by PrivGuard)
+
+DemoApp provides structured DPDPA compliance endpoints:
+
+| Endpoint | Method | Description |
+|---|---|---|
+| `/api/audit-feed/evidence` | `GET` | Consolidated 3-layer statutory evidence package (policy, inventory, logs, events, consents, DB schema) |
+| `/api/audit-feed/policy` | `GET` | Standalone DPDP Rules 2025 Digital Privacy Notice |
+| `/api/audit-feed/inventory` | `GET` | Declared Data Inventory with lawful bases and retention periods |
+| `/api/audit-feed/trigger-test/:scenarioId` | `POST` | Deterministically trigger test scenarios (`TEST-001` through `TEST-007`) |
+
+---
+
+## 5. Controlled DPDPA Test Scenarios
+
+DemoApp contains 7 intentional test scenarios to demonstrate PrivGuard's real-time detection:
+
+| Scenario ID | Name & Description | Statutory Rule | Severity |
+|---|---|---|---|
+| `TEST-001` | Raw PII (Name, Email, Mobile) logged in plain text | `POL-001` / `POL-002` (Sec 8(5)) | **HIGH** |
+| `TEST-002` | Excessive Personal Data Exposure via Profile API | `POL-004` (Sec 6(1)) | **HIGH** |
+| `TEST-003` | Consent Failure: Marketing processing post-withdrawal | `POL-004` (Sec 6(4)) | **CRITICAL** |
+| `TEST-004` | Purpose Mismatch: Mobile declared for OTP used in Orders | `POL-004` (Sec 6(1)) | **HIGH** |
+| `TEST-005` | Storage Limitation: Record age exceeds declared 365 days | `POL-005` (Sec 8(7)) | **MEDIUM** |
+| `TEST-006` | Financial PII: Plaintext PAN card in KYC flow | `POL-003` (Sec 8(5)) | **CRITICAL** |
+| `TEST-007` | Data Principal Right-to-Erasure Request | `RULE-010` (Sec 12) | **MEDIUM** |
+
+---
+
+## 6. Local Setup & Execution
 
 ### Prerequisites
-- Node.js 18+
-- MySQL 8+
-
-### Step 1 — Database Setup
-
-```sql
--- In MySQL client:
-source path/to/DemoApp/backend/database/schema.sql
-source path/to/DemoApp/backend/database/seed.sql
-```
-
-Or run:
-```bash
-mysql -u root -p < backend/database/schema.sql
-mysql -u root -p < backend/database/seed.sql
-```
-
-### Step 2 — Backend
-
-```bash
-cd backend
-npm install
-# Edit .env with your MySQL credentials
-npm run dev
-```
-
-Backend runs on: `http://localhost:5001`  
-Swagger docs: `http://localhost:5001/api-docs`
-
-### Step 3 — Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Frontend runs on: `http://localhost:3001`
+* Node.js v18+
+* MySQL 8+ (or pre-configured cloud MySQL database)
 
 ---
 
-## 10. Environment Variables
+### Step 1: Backend Setup
 
+```bash
+cd DemoApp/backend
+npm install
+```
+
+Configure `.env`:
 ```env
 PORT=5001
 DATABASE_HOST=localhost
 DATABASE_PORT=3306
 DATABASE_NAME=demoapp_db
 DATABASE_USER=root
-DATABASE_PASSWORD=your_password
-JWT_SECRET_KEY=your_jwt_secret
-JWT_EXPIRES_IN=2h
+DATABASE_PASSWORD=your_mysql_password
+JWT_SECRET_KEY=demoapp_jwt_secret
+PRIVGUARD_URL=http://localhost:5000
+```
+
+Start the backend:
+```bash
+npm start
+# Running on http://localhost:5001
+# Swagger docs at http://localhost:5001/api-docs
 ```
 
 ---
 
-## 11. Demo Credentials
+### Step 2: Frontend Setup
 
-| Role  | Email / Username       | Password   |
-|-------|------------------------|------------|
-| User  | user1@example.com      | Demo@1234  |
-| User  | user2@example.com      | Demo@1234  |
-| Admin | admin                  | password   |
-
----
-
-## 12. Demo Workflow
-
-1. Register a new user → triggers PII log (TEST-001)
-2. Login → triggers purpose mismatch event (TEST-004)
-3. View Profile → API returns excessive data (TEST-002)
-4. Browse Products → Place an order → triggers mobile in order log (TEST-001 + TEST-004)
-5. Go to Consents → Grant MARKETING → Withdraw MARKETING → marketing event still fires (TEST-003)
-6. Submit Deletion Request
-7. Login as Admin → view Events and Audit Logs to see all generated evidence
+```bash
+cd DemoApp/frontend
+npm install
+npm run dev
+# Running on http://localhost:5174
+```
 
 ---
 
-## 13. Security Considerations
+## 7. Demo Accounts
 
-- Passwords are bcrypt-hashed (never stored in plain text)
-- JWT tokens expire in 2 hours
-- No real personal information is used — all data is synthetic
-- Intentional test scenarios are limited to DPDPA data-governance behavior only
-- No SQL injection, XSS, or authentication bypass vulnerabilities are intentionally introduced
-- Secrets are loaded from environment variables only
+| Role | Email / Username | Password |
+|---|---|---|
+| **Data Principal (User)** | `user1@example.com` | `Demo@1234` |
+| **Data Principal (User 2)**| `user2@example.com` | `Demo@1234` |
+| **Application Admin** | `admin` | `password` |
+
+---
+
+## 8. Integration Testing with PrivGuard
+
+To trigger all 7 DPDPA scenarios on DemoApp and verify real-time PrivGuard auditing:
+
+```bash
+cd privGaurd/Backend
+node demo.js
+```
