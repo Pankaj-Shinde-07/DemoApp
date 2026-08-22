@@ -35,6 +35,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // ── Health Check ──────────────────────────────────────────────────────────────
 app.get('/health', (req, res) => res.json({ status: 'ok', app: 'DemoApp', version: '1.0.0' }));
+app.get('/', (req, res) => res.json({ status: 'ok', app: 'DemoApp', message: 'DemoApp Simulated Target API is running' }));
 
 // ── Start ─────────────────────────────────────────────────────────────────────
 connectDB().then(() => {
