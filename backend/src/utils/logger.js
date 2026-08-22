@@ -17,18 +17,43 @@ const logger = winston.createLogger({
 });
 
 /**
- * Persist a log entry to the application_audit_logs table.
+ * Persist a log entry to the application_audit_logs table and stream to PrivGuard in real time.
  */
 const persistLog = async ({ level = 'INFO', action, userId = null, message, rawLogData = {}, ipAddress = null }) => {
+    const logId = uuidv4();
     try {
         await pool.execute(
             `INSERT INTO application_audit_logs (logId, level, action, userId, message, rawLogData, ipAddress)
              VALUES (?, ?, ?, ?, ?, ?, ?)`,
-            [uuidv4(), level.toUpperCase(), action, userId, message, JSON.stringify(rawLogData), ipAddress]
+            [logId, level.toUpperCase(), action, userId, message, JSON.stringify(rawLogData), ipAddress]
         );
     } catch (err) {
         logger.error(`Failed to persist log: ${err.message}`);
     }
+
+    // Stream log to PrivGuard in real-time
+    try {
+        const privguardUrl = (process.env.PRIVGUARD_URL || 'http://localhost:5000').replace(/\/$/, '');
+        fetch(`${privguardUrl}/api/events`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                eventId: logId,
+                type: `LOG_${action || 'ENTRY'}`,
+                source: 'APPLICATION_LOG',
+                service: 'demoapp-core',
+                endpoint: action ? `/${action.toLowerCase()}` : '/app-logs',
+                payload: {
+                    message,
+                    action,
+                    userId,
+                    ipAddress,
+                    ...rawLogData
+                },
+                timestamp: new Date().toISOString()
+            })
+        }).catch(() => {});
+    } catch (_) {}
 };
 
 /**
