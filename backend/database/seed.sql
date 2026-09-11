@@ -14,6 +14,7 @@ INSERT INTO admin_users (username, email, passwordHash) VALUES
 -- Demo users (password for all: Demo@1234)
 -- Hash: $2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LPVyNAcoRHa
 -- ============================================================
+
 INSERT INTO users (id, fullName, email, mobileNumber, passwordHash, dateOfBirth, gender, address, city, state, postalCode) VALUES
 (1, 'Demo User One',   'user1@example.com', '9000000001', '$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LPVyNAcoRHa', '1995-06-15', 'male',   '12 Demo Street, Block A', 'Mumbai',    'Maharashtra', '400001'),
 (2, 'Demo User Two',   'user2@example.com', '9000000002', '$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LPVyNAcoRHa', '1990-03-22', 'female', '45 Sample Road',          'Delhi',     'Delhi',       '110001'),
