@@ -334,8 +334,55 @@ const triggerTestScenario = async (req, res) => {
                 });
             }
 
+            case 'TEST-008': {
+                // TEST-008: Architectural Privacy Drift (Phone routed to unapproved marketing service)
+                const driftPhone = `+91 98${Math.floor(10000000 + Math.random() * 90000000)}`;
+                await emitEvent({
+                    eventType: 'MARKETING_CAMPAIGN_DISPATCHED',
+                    userId: 1,
+                    dataFields: ['mobileNumber'],
+                    purpose: 'MARKETING',
+                    ipAddress: ip,
+                    userAgent: ua,
+                    metadata: {
+                        service: 'marketing-service',
+                        parentService: 'auth-service',
+                        phone: driftPhone,
+                        note: 'INTENTIONAL_DPDPA_TEST_CASE: PRIVACY_DRIFT — Mobile data flowed to unapproved marketing-service (Contract Violation).'
+                    }
+                });
+                return res.json({
+                    success: true,
+                    scenarioId,
+                    rule: 'RULE-DRIFT',
+                    severity: 'CRITICAL',
+                    message: 'TEST-008 triggered: Architectural Privacy Drift (Phone routed to marketing-service).',
+                    phone: driftPhone
+                });
+            }
+
+            case 'TEST-009': {
+                // TEST-009: High-Entropy Secret & API Token Leak
+                const leakedKey = 'sk_live_51MzJ7YABCD1234567890XYZWVUTSRQPONM';
+                await logWithPII({
+                    action: 'PAYMENT_GATEWAY_WEBHOOK',
+                    userId: 1,
+                    message: `Stripe webhook authentication failed with live secret key: ${leakedKey}`,
+                    piiData: { apiKey: leakedKey },
+                    ipAddress: ip
+                });
+                return res.json({
+                    success: true,
+                    scenarioId,
+                    rule: 'RULE-SECRET-LEAK',
+                    severity: 'CRITICAL',
+                    message: 'TEST-009 triggered: Live API Secret Key leaked in application logs.',
+                    key: leakedKey
+                });
+            }
+
             default:
-                return res.status(400).json({ success: false, message: `Unknown scenarioId: ${scenarioId}. Valid IDs: TEST-001 through TEST-007` });
+                return res.status(400).json({ success: false, message: `Unknown scenarioId: ${scenarioId}. Valid IDs: TEST-001 through TEST-009` });
         }
     } catch (err) {
         return res.status(500).json({ success: false, message: 'Failed to trigger test scenario', error: err.message });

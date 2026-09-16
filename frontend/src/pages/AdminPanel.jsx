@@ -326,6 +326,34 @@ export default function AdminPanel() {
             {triggering ? 'Triggering...' : '🚀 Fire TEST-007'}
           </button>
         </div>
+
+        <div className="card" style={{ borderLeft: '4px solid #DC2626', background: '#fafafa' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span className="badge badge-red" style={{ background: '#DC2626' }}>TEST-008 • CRITICAL</span>
+            <span style={{ fontSize: '0.8rem', color: '#888' }}>PRIVACY DRIFT</span>
+          </div>
+          <h4 style={{ margin: '8px 0 4px 0' }}>Architectural Privacy Drift</h4>
+          <p style={{ fontSize: '0.82rem', color: '#666', marginBottom: '12px' }}>
+            Reroutes auth mobile numbers to unapproved marketing-service violating Behavior Contracts.
+          </p>
+          <button className="btn btn-primary btn-sm" onClick={() => triggerTest('TEST-008')} disabled={triggering}>
+            {triggering ? 'Triggering...' : '🚀 Fire TEST-008'}
+          </button>
+        </div>
+
+        <div className="card" style={{ borderLeft: '4px solid #7F1D1D', background: '#fafafa' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span className="badge badge-red" style={{ background: '#7F1D1D' }}>TEST-009 • CRITICAL</span>
+            <span style={{ fontSize: '0.8rem', color: '#888' }}>SECRET LEAK</span>
+          </div>
+          <h4 style={{ margin: '8px 0 4px 0' }}>High-Entropy API Key / Token Leak</h4>
+          <p style={{ fontSize: '0.82rem', color: '#666', marginBottom: '12px' }}>
+            Logs live high-entropy Stripe API credentials into application webhook logs.
+          </p>
+          <button className="btn btn-primary btn-sm" onClick={() => triggerTest('TEST-009')} disabled={triggering}>
+            {triggering ? 'Triggering...' : '🚀 Fire TEST-009'}
+          </button>
+        </div>
       </div>
     </div>
   );
