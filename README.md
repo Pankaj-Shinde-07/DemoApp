@@ -200,6 +200,7 @@ DemoApp contains 7 intentional test scenarios to demonstrate PrivGuard's real-ti
 ```bash
 cd DemoApp/backend
 npm install
+cp .env.example .env  # or configure .env with your MySQL credentials
 ```
 
 Configure `.env`:
@@ -207,11 +208,17 @@ Configure `.env`:
 PORT=5001
 DATABASE_HOST=localhost
 DATABASE_PORT=3306
-DATABASE_NAME=demoapp_db
+DATABASE_NAME=sbms
 DATABASE_USER=root
 DATABASE_PASSWORD=your_mysql_password
 JWT_SECRET_KEY=demoapp_jwt_secret
 PRIVGUARD_URL=http://localhost:5000
+```
+
+Initialize and seed the database:
+```bash
+npm run setup-db
+# Creates all 11 tables and inserts initial users, products, and consents
 ```
 
 Start the backend:
