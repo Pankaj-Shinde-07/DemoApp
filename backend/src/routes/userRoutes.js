@@ -11,6 +11,7 @@ const {
     nominateRepresentative
 } = require('../controllers/userController');
 const { authMiddleware } = require('../middleware/authMiddleware');
+const { checkUserOwnership } = require('../middleware/ownershipMiddleware');
 
 /**
  * @swagger
@@ -68,7 +69,7 @@ router.post('/login', login);
  * @swagger
  * /api/users/{id}:
  *   get:
- *     summary: Get user profile (INTENTIONAL — returns excessive personal data)
+ *     summary: Get user profile
  *     tags: [Users]
  *     security: [{ bearerAuth: [] }]
  *     parameters:
@@ -77,9 +78,9 @@ router.post('/login', login);
  *         required: true
  *         schema: { type: integer }
  *     responses:
- *       200: { description: User profile with all personal data fields }
+ *       200: { description: User profile with personal data fields }
  */
-router.get('/:id', authMiddleware, getProfile);
+router.get('/:id', authMiddleware, checkUserOwnership('id'), getProfile);
 
 /**
  * @swagger
@@ -89,7 +90,7 @@ router.get('/:id', authMiddleware, getProfile);
  *     tags: [Users]
  *     security: [{ bearerAuth: [] }]
  */
-router.put('/:id', authMiddleware, updateProfile);
+router.put('/:id', authMiddleware, checkUserOwnership('id'), updateProfile);
 
 /**
  * @swagger
@@ -99,7 +100,7 @@ router.put('/:id', authMiddleware, updateProfile);
  *     tags: [Users]
  *     security: [{ bearerAuth: [] }]
  */
-router.get('/:id/events', authMiddleware, getUserEvents);
+router.get('/:id/events', authMiddleware, checkUserOwnership('id'), getUserEvents);
 
 /**
  * @swagger
@@ -109,7 +110,7 @@ router.get('/:id/events', authMiddleware, getUserEvents);
  *     tags: [Users]
  *     security: [{ bearerAuth: [] }]
  */
-router.post('/:id/deletion-request', authMiddleware, requestDeletion);
+router.post('/:id/deletion-request', authMiddleware, checkUserOwnership('id'), requestDeletion);
 
 /**
  * @swagger
@@ -119,7 +120,7 @@ router.post('/:id/deletion-request', authMiddleware, requestDeletion);
  *     tags: [Users]
  *     security: [{ bearerAuth: [] }]
  */
-router.get('/:id/download-data', authMiddleware, downloadUserData);
+router.get('/:id/download-data', authMiddleware, checkUserOwnership('id'), downloadUserData);
 
 /**
  * @swagger
@@ -129,7 +130,7 @@ router.get('/:id/download-data', authMiddleware, downloadUserData);
  *     tags: [Users]
  *     security: [{ bearerAuth: [] }]
  */
-router.post('/:id/grievance', authMiddleware, submitGrievance);
+router.post('/:id/grievance', authMiddleware, checkUserOwnership('id'), submitGrievance);
 
 /**
  * @swagger
@@ -139,6 +140,6 @@ router.post('/:id/grievance', authMiddleware, submitGrievance);
  *     tags: [Users]
  *     security: [{ bearerAuth: [] }]
  */
-router.post('/:id/nominate', authMiddleware, nominateRepresentative);
+router.post('/:id/nominate', authMiddleware, checkUserOwnership('id'), nominateRepresentative);
 
 module.exports = router;

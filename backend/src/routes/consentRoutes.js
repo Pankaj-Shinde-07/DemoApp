@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const { getConsents, grantConsent, withdrawConsent } = require('../controllers/consentController');
 const { authMiddleware } = require('../middleware/authMiddleware');
+const { checkUserOwnership } = require('../middleware/ownershipMiddleware');
 
 /**
  * @swagger
@@ -15,7 +16,7 @@ const { authMiddleware } = require('../middleware/authMiddleware');
  *         required: true
  *         schema: { type: integer }
  */
-router.get('/:userId', authMiddleware, getConsents);
+router.get('/:userId', authMiddleware, checkUserOwnership('userId'), getConsents);
 
 /**
  * @swagger
@@ -35,7 +36,7 @@ router.get('/:userId', authMiddleware, getConsents);
  *               userId:  { type: integer, example: 1 }
  *               purpose: { type: string, enum: [ACCOUNT_SERVICE, SERVICE_COMMUNICATION, MARKETING, ANALYTICS] }
  */
-router.post('/', authMiddleware, grantConsent);
+router.post('/', authMiddleware, checkUserOwnership('userId'), grantConsent);
 
 /**
  * @swagger

@@ -4,29 +4,41 @@ const { v4: uuidv4 } = require('uuid');
 const { pool } = require('../models/db');
 const { logInfo, logWithPII, logError } = require('../utils/logger');
 const { emitEvent } = require('../events/eventEmitter');
+const { validateRegistrationInput } = require('../utils/validation');
+const { isTestMode } = require('../utils/testMode');
 
 // ── Register ──────────────────────────────────────────────────────────────────
 const register = async (req, res) => {
+    // 1. Input Validation
+    const validationError = validateRegistrationInput(req.body);
+    if (validationError) {
+        return res.status(400).json({ success: false, message: validationError });
+    }
+
     const { fullName, email, mobileNumber, password, dateOfBirth, gender, address, city, state, postalCode } = req.body;
     const ip = req.ip || req.connection.remoteAddress;
     const ua = req.headers['user-agent'];
 
-    if (!fullName || !email || !mobileNumber || !password) {
-        return res.status(400).json({ success: false, message: 'fullName, email, mobileNumber and password are required.' });
-    }
-
+    let conn;
     try {
-        const [existing] = await pool.execute('SELECT id FROM users WHERE email = ? OR mobileNumber = ?', [email, mobileNumber]);
+        conn = await pool.getConnection();
+        await conn.beginTransaction();
+
+        const [existing] = await conn.execute(
+            'SELECT id FROM users WHERE email = ? OR mobileNumber = ?',
+            [email.trim(), String(mobileNumber).trim()]
+        );
         if (existing.length > 0) {
+            await conn.rollback();
             return res.status(409).json({ success: false, message: 'Email or mobile number already registered.' });
         }
 
         const passwordHash = await bcrypt.hash(password, 10);
 
-        const [result] = await pool.execute(
+        const [result] = await conn.execute(
             `INSERT INTO users (fullName, email, mobileNumber, passwordHash, dateOfBirth, gender, address, city, state, postalCode)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [fullName, email, mobileNumber, passwordHash, dateOfBirth || null, gender || 'prefer_not_to_say', address || null, city || null, state || null, postalCode || null]
+            [fullName.trim(), email.trim(), String(mobileNumber).trim(), passwordHash, dateOfBirth || null, gender || 'prefer_not_to_say', address || null, city || null, state || null, postalCode || null]
         );
 
         const userId = result.insertId;
@@ -48,33 +60,45 @@ const register = async (req, res) => {
 
             const grantedAt = status === 'GRANTED' ? new Date() : null;
             const withdrawnAt = status === 'WITHDRAWN' ? new Date() : null;
-            const [consentRes] = await pool.execute(
+            const [consentRes] = await conn.execute(
                 `INSERT INTO consents (userId, purpose, status, source, grantedAt, withdrawnAt) VALUES (?, ?, ?, ?, ?, ?)`,
                 [userId, purpose, status, 'user_registration', grantedAt, withdrawnAt]
             );
 
-            await pool.execute(
+            await conn.execute(
                 `INSERT INTO consent_history (userId, consentId, purpose, action, previousStatus, newStatus, source, ipAddress, userAgent)
                  VALUES (?, ?, ?, ?, NULL, ?, 'user_registration', ?, ?)`,
                 [userId, consentRes.insertId, purpose, status, status, ip, ua]
             );
         }
 
-        // INTENTIONAL_DPDPA_TEST_CASE: PII_IN_LOGS
-        // Intentionally logs personal data (name, email, mobile) in the application log.
-        // The external DPDPA Audit Platform should detect this as RULE-001: Personal data in logs.
-        await logWithPII({
-            action: 'USER_REGISTERED',
-            userId,
-            message: 'User registered:',
-            piiData: { name: fullName, email, mobile: mobileNumber },
-            ipAddress: ip
-        });
+        // Commit transaction atomically
+        await conn.commit();
+
+        // Logging & Telemetry: Controlled Test vs Production behavior
+        if (isTestMode()) {
+            // INTENTIONAL_DPDPA_TEST_CASE: PII_IN_LOGS in test mode
+            await logWithPII({
+                action: 'USER_REGISTERED',
+                userId,
+                message: 'User registered:',
+                piiData: { name: fullName, email, mobile: mobileNumber },
+                ipAddress: ip
+            });
+        } else {
+            // Production: Masked log
+            await logInfo({
+                action: 'USER_REGISTERED',
+                userId,
+                message: `User registration completed for userId=${userId}`,
+                ipAddress: ip
+            });
+        }
 
         await emitEvent({
             eventType: 'USER_REGISTERED',
             userId,
-            dataFields: ['fullName', 'email', 'mobileNumber', 'dateOfBirth', 'address'],
+            dataFields: isTestMode() ? ['fullName', 'email', 'mobileNumber', 'dateOfBirth', 'address'] : ['fullName', 'email'],
             purpose: 'ACCOUNT_SERVICE',
             ipAddress: ip,
             userAgent: ua
@@ -83,7 +107,7 @@ const register = async (req, res) => {
         await emitEvent({
             eventType: 'PROFILE_CREATED',
             userId,
-            dataFields: ['fullName', 'email', 'mobileNumber'],
+            dataFields: isTestMode() ? ['fullName', 'email', 'mobileNumber'] : ['fullName'],
             purpose: 'ACCOUNT_SERVICE',
             ipAddress: ip,
             userAgent: ua
@@ -91,8 +115,13 @@ const register = async (req, res) => {
 
         return res.status(201).json({ success: true, message: 'Registration successful.', userId });
     } catch (err) {
+        if (conn) {
+            try { await conn.rollback(); } catch (_) {}
+        }
         await logError({ action: 'USER_REGISTER_ERROR', message: err.message });
-        return res.status(500).json({ success: false, message: 'Registration failed. Please try again.' });
+        return res.status(500).json({ success: false, message: 'Registration failed. Transaction rolled back.' });
+    } finally {
+        if (conn) conn.release();
     }
 };
 
@@ -107,7 +136,7 @@ const login = async (req, res) => {
     }
 
     try {
-        const [rows] = await pool.execute('SELECT * FROM users WHERE email = ? AND isActive = TRUE', [email]);
+        const [rows] = await pool.execute('SELECT * FROM users WHERE email = ? AND isActive = TRUE', [email.trim()]);
         if (rows.length === 0) {
             return res.status(401).json({ success: false, message: 'Invalid credentials.' });
         }
@@ -124,18 +153,18 @@ const login = async (req, res) => {
             { expiresIn: process.env.JWT_EXPIRES_IN || '2h' }
         );
 
-        await logInfo({ action: 'USER_LOGIN', userId: user.id, message: `User login successful for ${email}`, rawLogData: { email }, ipAddress: ip });
+        await logInfo({ action: 'USER_LOGIN', userId: user.id, message: `User login successful for userId=${user.id}`, ipAddress: ip });
 
+        // Test mode purpose-mismatch hook
+        const loginDataFields = isTestMode() ? ['email', 'mobileNumber'] : ['email'];
         await emitEvent({
             eventType: 'USER_LOGIN',
             userId: user.id,
-            // INTENTIONAL_DPDPA_TEST_CASE: PURPOSE_MISMATCH
-            // mobileNumber is included in the login event even though its declared purpose is OTP verification only.
-            dataFields: ['email', 'mobileNumber'],
+            dataFields: loginDataFields,
             purpose: 'ACCOUNT_SERVICE',
             ipAddress: ip,
             userAgent: ua,
-            metadata: { note: 'INTENTIONAL_DPDPA_TEST_CASE: PURPOSE_MISMATCH — mobileNumber used in login event; declared purpose is OTP verification only.' }
+            metadata: isTestMode() ? { note: 'INTENTIONAL_DPDPA_TEST_CASE: PURPOSE_MISMATCH — mobileNumber used in login event' } : undefined
         });
 
         return res.status(200).json({
@@ -151,13 +180,15 @@ const login = async (req, res) => {
 };
 
 // ── Get Profile ───────────────────────────────────────────────────────────────
-// INTENTIONAL_DPDPA_TEST_CASE: EXCESSIVE_API_DATA_EXPOSURE
-// This endpoint intentionally returns more personal data fields than necessary.
-// The external DPDPA Audit Platform should detect this as RULE-006: Excessive personal data exposure via API.
 const getProfile = async (req, res) => {
     const userId = parseInt(req.params.id);
     const ip = req.ip || req.connection.remoteAddress;
     const ua = req.headers['user-agent'];
+
+    // Enforce Ownership
+    if (!req.user.isAdmin && userId !== req.user.userId) {
+        return res.status(403).json({ success: false, message: 'Forbidden: You do not have permission to view this profile.' });
+    }
 
     try {
         const [rows] = await pool.execute(
@@ -172,18 +203,15 @@ const getProfile = async (req, res) => {
         await emitEvent({
             eventType: 'USER_PROFILE_ACCESSED',
             userId,
-            // INTENTIONAL_DPDPA_TEST_CASE: PURPOSE_MISMATCH
-            // mobileNumber accessed during profile view; declared purpose is OTP verification only.
-            dataFields: ['fullName', 'email', 'mobileNumber', 'dateOfBirth', 'address'],
+            dataFields: isTestMode() ? ['fullName', 'email', 'mobileNumber', 'dateOfBirth', 'address'] : ['fullName', 'email'],
             purpose: 'ACCOUNT_SERVICE',
             ipAddress: ip,
             userAgent: ua,
-            metadata: { note: 'INTENTIONAL_DPDPA_TEST_CASE: EXCESSIVE_API_DATA_EXPOSURE + PURPOSE_MISMATCH' }
+            metadata: isTestMode() ? { note: 'INTENTIONAL_DPDPA_TEST_CASE: EXCESSIVE_API_DATA_EXPOSURE' } : undefined
         });
 
         await logInfo({ action: 'USER_PROFILE_ACCESSED', userId, message: `Profile accessed for userId=${userId}`, ipAddress: ip });
 
-        // Intentionally returns all fields including dateOfBirth, address, mobileNumber
         return res.status(200).json({ success: true, user: rows[0] });
     } catch (err) {
         return res.status(500).json({ success: false, message: 'Failed to fetch profile.' });
@@ -193,13 +221,19 @@ const getProfile = async (req, res) => {
 // ── Update Profile ────────────────────────────────────────────────────────────
 const updateProfile = async (req, res) => {
     const userId = parseInt(req.params.id);
+
+    // Enforce Ownership
+    if (!req.user.isAdmin && userId !== req.user.userId) {
+        return res.status(403).json({ success: false, message: 'Forbidden: You do not have permission to update this profile.' });
+    }
+
     const { fullName, address, city, state, postalCode, gender } = req.body;
     const ip = req.ip || req.connection.remoteAddress;
 
     try {
         await pool.execute(
             `UPDATE users SET fullName=?, address=?, city=?, state=?, postalCode=?, gender=?, updatedAt=NOW() WHERE id=?`,
-            [fullName, address, city, state, postalCode, gender, userId]
+            [fullName ? fullName.trim() : null, address || null, city || null, state || null, postalCode || null, gender || 'prefer_not_to_say', userId]
         );
 
         await logInfo({ action: 'USER_PROFILE_UPDATED', userId, message: `Profile updated for userId=${userId}`, ipAddress: ip });
@@ -214,6 +248,12 @@ const updateProfile = async (req, res) => {
 // ── Get User Events ───────────────────────────────────────────────────────────
 const getUserEvents = async (req, res) => {
     const userId = parseInt(req.params.id);
+
+    // Enforce Ownership
+    if (!req.user.isAdmin && userId !== req.user.userId) {
+        return res.status(403).json({ success: false, message: 'Forbidden: You do not have permission to access these events.' });
+    }
+
     try {
         const [rows] = await pool.execute(
             'SELECT * FROM data_processing_events WHERE userId = ? ORDER BY createdAt DESC LIMIT 100',
@@ -228,6 +268,12 @@ const getUserEvents = async (req, res) => {
 // ── Deletion Request ──────────────────────────────────────────────────────────
 const requestDeletion = async (req, res) => {
     const userId = parseInt(req.params.id);
+
+    // Enforce Ownership
+    if (!req.user.isAdmin && userId !== req.user.userId) {
+        return res.status(403).json({ success: false, message: 'Forbidden: You do not have permission to submit deletion for this user.' });
+    }
+
     const { reason } = req.body;
     const ip = req.ip || req.connection.remoteAddress;
 
@@ -258,6 +304,12 @@ const requestDeletion = async (req, res) => {
 // ── DPDPA Sec 11: Right to Access & Data Portability Download ────────────────
 const downloadUserData = async (req, res) => {
     const userId = parseInt(req.params.id);
+
+    // Enforce Ownership
+    if (!req.user.isAdmin && userId !== req.user.userId) {
+        return res.status(403).json({ success: false, message: 'Forbidden: You do not have permission to export this data archive.' });
+    }
+
     const ip = req.ip || req.connection.remoteAddress;
 
     try {
@@ -299,6 +351,12 @@ const downloadUserData = async (req, res) => {
 // ── DPDPA Sec 13: Right to Grievance Redressal ────────────────────────────────
 const submitGrievance = async (req, res) => {
     const userId = parseInt(req.params.id);
+
+    // Enforce Ownership
+    if (!req.user.isAdmin && userId !== req.user.userId) {
+        return res.status(403).json({ success: false, message: 'Forbidden: You do not have permission to file grievances for this user.' });
+    }
+
     const { category, complaintDetails } = req.body;
     const ip = req.ip || req.connection.remoteAddress;
 
@@ -345,6 +403,12 @@ const submitGrievance = async (req, res) => {
 // ── DPDPA Sec 14: Right to Nominate ──────────────────────────────────────────
 const nominateRepresentative = async (req, res) => {
     const userId = parseInt(req.params.id);
+
+    // Enforce Ownership
+    if (!req.user.isAdmin && userId !== req.user.userId) {
+        return res.status(403).json({ success: false, message: 'Forbidden: You do not have permission to register nominees for this user.' });
+    }
+
     const { nomineeName, nomineeEmail, nomineeMobile, relationship } = req.body;
     const ip = req.ip || req.connection.remoteAddress;
 

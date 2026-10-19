@@ -5,6 +5,10 @@ const {
     getPrivacyPolicy,
     triggerTestScenario
 } = require('../controllers/auditFeedController');
+const { auditAuthMiddleware } = require('../middleware/auditAuthMiddleware');
+
+// Enforce machine-to-machine authentication on all audit feed endpoints
+router.use(auditAuthMiddleware);
 
 /**
  * @swagger

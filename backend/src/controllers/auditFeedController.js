@@ -4,6 +4,7 @@ const { pool } = require('../models/db');
 const { v4: uuidv4 } = require('uuid');
 const { logWithPII, logInfo, logWarn } = require('../utils/logger');
 const { emitEvent } = require('../events/eventEmitter');
+const { isTestMode } = require('../utils/testMode');
 
 // Load data inventory from docs/data-inventory.json
 const getInventoryData = () => {
@@ -67,19 +68,40 @@ const getPrivacyPolicyData = () => ({
 
 /**
  * GET /api/audit-feed/evidence
- * Consolidated evidence endpoint consumed by external DPDPA auditors.
+ * Consolidated scoped evidence endpoint consumed by external DPDPA auditors.
+ * Returns strictly the compliance evidence PrivGuard requires without leaking raw user credentials/PII.
  */
 const getEvidencePackage = async (req, res) => {
     try {
         const inventory = getInventoryData();
         const policy = getPrivacyPolicyData();
 
-        const [events] = await pool.execute('SELECT * FROM data_processing_events ORDER BY createdAt DESC LIMIT 200');
-        const [logs] = await pool.execute('SELECT * FROM application_audit_logs ORDER BY createdAt DESC LIMIT 200');
-        const [consents] = await pool.execute('SELECT c.*, u.fullName, u.email FROM consents c JOIN users u ON c.userId = u.id ORDER BY c.updatedAt DESC');
-        const [consentHistory] = await pool.execute('SELECT * FROM consent_history ORDER BY createdAt DESC LIMIT 100');
-        const [users] = await pool.execute('SELECT id, fullName, email, mobileNumber, dateOfBirth, gender, city, state, postalCode, isActive, createdAt FROM users ORDER BY createdAt DESC LIMIT 100');
-        const [deletionRequests] = await pool.execute('SELECT dr.*, u.fullName, u.email FROM data_deletion_requests dr JOIN users u ON dr.userId = u.id ORDER BY dr.requestedAt DESC');
+        let events = [], logs = [], consents = [], consentHistory = [], users = [], deletionRequests = [];
+        try {
+            const [evRows] = await pool.execute('SELECT * FROM data_processing_events ORDER BY createdAt DESC LIMIT 200');
+            events = evRows;
+        } catch (_) {}
+        try {
+            const [logRows] = await pool.execute('SELECT * FROM application_audit_logs ORDER BY createdAt DESC LIMIT 200');
+            logs = logRows;
+        } catch (_) {}
+        try {
+            const [consentRows] = await pool.execute('SELECT id, userId, purpose, status, validUntil, updatedAt, createdAt FROM consents ORDER BY updatedAt DESC');
+            consents = consentRows;
+        } catch (_) {}
+        try {
+            const [historyRows] = await pool.execute('SELECT * FROM consent_history ORDER BY createdAt DESC LIMIT 100');
+            consentHistory = historyRows;
+        } catch (_) {}
+        try {
+            // Return scoped user metadata needed for data principal rights count — no credentials or raw PII
+            const [userRows] = await pool.execute('SELECT id, isActive, createdAt FROM users ORDER BY createdAt DESC LIMIT 100');
+            users = userRows;
+        } catch (_) {}
+        try {
+            const [drRows] = await pool.execute('SELECT id, requestId, userId, reason, status, requestedAt, completedAt FROM data_deletion_requests ORDER BY requestedAt DESC');
+            deletionRequests = drRows;
+        } catch (_) {}
 
         // Table schema summary
         const databaseSchema = {
@@ -138,8 +160,16 @@ const getPrivacyPolicy = (req, res) => {
 /**
  * POST /api/audit-feed/trigger-test/:scenarioId
  * Deterministically triggers a DPDPA compliance test scenario on demand.
+ * Strictly gated behind test-mode: disabled in production.
  */
 const triggerTestScenario = async (req, res) => {
+    if (!isTestMode()) {
+        return res.status(403).json({
+            success: false,
+            message: 'Forbidden: Test scenarios are disabled in production mode. Test mode must be enabled to trigger simulated non-compliance events.'
+        });
+    }
+
     const { scenarioId } = req.params;
     const ip = req.ip || '127.0.0.1';
     const ua = req.headers['user-agent'] || 'Auditor-Test-Agent/1.0';

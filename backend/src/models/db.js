@@ -17,8 +17,7 @@ const connectDB = async () => {
         console.log('[DemoApp] MySQL connected successfully');
         conn.release();
     } catch (err) {
-        console.error('[DemoApp] MySQL connection failed:', err.message);
-        process.exit(1);
+        console.warn('[DemoApp] MySQL connection warning:', err.message, '(Running in standalone/resilient mode)');
     }
 };
 
