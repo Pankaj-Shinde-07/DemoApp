@@ -101,7 +101,7 @@ export default function Register() {
           </div>
           {/* DPDPA STATUTORY CONSENT SECTION */}
           <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', padding: '14px', borderRadius: '8px', marginBottom: '1.25rem' }}>
-            <div style={{ fontSize: '0.85rem', fontWeight: '700', color: '#1E1B4B', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ fontSize: '0.85rem', fontWeight: '700', color: '#0F172A', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
               DPDPA Statutory Privacy & Consent Declarations
             </div>
 
@@ -115,7 +115,7 @@ export default function Register() {
                 style={{ marginTop: '3px', cursor: 'pointer' }}
               />
               <label htmlFor="regPrivacyPolicy" style={{ fontSize: '0.8rem', color: '#334155', cursor: 'pointer', lineHeight: '1.4' }}>
-                <span style={{ color: '#DC2626', fontWeight: 'bold' }}>*</span> I have read and agree to the <Link to="/privacy-policy" target="_blank" style={{ color: '#4F46E5', textDecoration: 'underline' }}>Privacy Policy Notice</Link> and authorize processing of essential personal data for account operations under DPDPA Section 5 & 6.
+                <span style={{ color: '#DC2626', fontWeight: 'bold' }}>*</span> I have read and agree to the <Link to="/privacy-policy" target="_blank" style={{ color: '#2563EB', textDecoration: 'underline' }}>Privacy Policy Notice</Link> and authorize processing of essential personal data for account operations under DPDPA Section 5 & 6.
               </label>
             </div>
 
@@ -146,8 +146,8 @@ export default function Register() {
             </div>
           </div>
 
-          <button className="btn btn-primary" type="submit" disabled={loading || !privacyAgreed}>
-            {loading ? 'Registering...' : 'Register'}
+          <button className="btn btn-primary" type="submit" disabled={loading || !privacyAgreed} style={{ width: '100%', marginTop: '0.5rem' }}>
+            {loading ? 'Registering...' : 'Register Account'}
           </button>
         </form>
         <div className="auth-links">

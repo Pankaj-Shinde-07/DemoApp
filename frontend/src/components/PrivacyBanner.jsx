@@ -56,63 +56,59 @@ export default function PrivacyBanner() {
       {visible && (
         <div style={{
           position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          background: '#0F172A',
-          color: '#F8FAFC',
-          padding: '1.25rem 2rem',
-          boxShadow: '0 -4px 20px rgba(0,0,0,0.35)',
+          bottom: '1rem',
+          left: '1rem',
+          right: '1rem',
+          maxWidth: '1080px',
+          margin: '0 auto',
+          background: '#FFFFFF',
+          color: '#0F172A',
+          padding: '1.1rem 1.5rem',
+          borderRadius: '12px',
+          boxShadow: '0 10px 25px -5px rgba(15, 23, 42, 0.15), 0 8px 10px -6px rgba(15, 23, 42, 0.1)',
           zIndex: 9998,
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           flexWrap: 'wrap',
           gap: '1rem',
-          borderTop: '2px solid #4F46E5'
+          border: '1px solid #E2E8F0'
         }}>
-          <div style={{ maxWidth: '780px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-              
-              <strong style={{ fontSize: '0.95rem', color: '#FFFFFF' }}>DPDPA Statutory Privacy & Consent Notice</strong>
-              <span style={{ background: '#312E81', color: '#C7D2FE', fontSize: '0.7rem', padding: '2px 6px', borderRadius: '4px', fontWeight: 600 }}>
+          <div style={{ maxWidth: '680px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '3px' }}>
+              <strong style={{ fontSize: '0.9rem', color: '#0F172A' }}>DPDPA Statutory Privacy & Consent Notice</strong>
+              <span style={{ background: '#F1F5F9', color: '#475569', fontSize: '0.68rem', padding: '2px 6px', borderRadius: '4px', fontWeight: 600, border: '1px solid #E2E8F0' }}>
                 DPDP Rules 2025
               </span>
             </div>
-            <p style={{ margin: 0, fontSize: '0.82rem', color: '#CBD5E1', lineHeight: '1.5' }}>
+            <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748B', lineHeight: '1.45' }}>
               Under India's Digital Personal Data Protection Act (DPDPA), we collect personal data strictly for specified purposes.
-              You have the statutory right to accept or reject optional data processing (Marketing & Analytics) or customize your preferences anytime.
-              Read our <Link to="/privacy-policy" style={{ color: '#818CF8', textDecoration: 'underline' }}>Privacy Policy Notice</Link>.
+              You have the statutory right to accept or reject optional data processing or customize preferences anytime.
+              Read our <Link to="/privacy-policy" style={{ color: '#2563EB', textDecoration: 'underline' }}>Privacy Policy Notice</Link>.
             </p>
           </div>
 
-          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             <button
               onClick={() => saveDecision('ACCEPT_ALL')}
-              style={{
-                background: '#4F46E5', color: '#FFFFFF', border: 'none',
-                padding: '8px 16px', borderRadius: '6px', fontSize: '0.85rem', fontWeight: '600', cursor: 'pointer'
-              }}
+              className="btn btn-primary btn-sm"
+              style={{ fontSize: '0.82rem', padding: '7px 14px' }}
             >
-              ✓ Accept All Policies
+              ✓ Accept All
             </button>
             <button
               onClick={() => saveDecision('REJECT_OPTIONAL')}
-              style={{
-                background: '#334155', color: '#F1F5F9', border: '1px solid #475569',
-                padding: '8px 16px', borderRadius: '6px', fontSize: '0.85rem', fontWeight: '600', cursor: 'pointer'
-              }}
+              className="btn btn-secondary btn-sm"
+              style={{ fontSize: '0.82rem', padding: '7px 14px' }}
             >
-              ✕ Reject Optional (Essential Only)
+              ✕ Reject Optional
             </button>
             <button
               onClick={() => setShowModal(true)}
-              style={{
-                background: 'transparent', color: '#94A3B8', border: '1px solid #475569',
-                padding: '8px 14px', borderRadius: '6px', fontSize: '0.85rem', cursor: 'pointer'
-              }}
+              className="btn btn-secondary btn-sm"
+              style={{ fontSize: '0.82rem', padding: '7px 12px' }}
             >
-              Customize
+              Preferences
             </button>
           </div>
         </div>

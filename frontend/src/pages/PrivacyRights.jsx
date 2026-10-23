@@ -78,11 +78,11 @@ export default function PrivacyRights() {
           <div>
             <span className="badge badge-blue">DPDPA Section 11</span>
             <h3 style={{ margin: '6px 0' }}>Right to Access & Data Portability</h3>
-            <p style={{ fontSize: '0.85rem', color: '#666' }}>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
               Obtain a machine-readable summary of all your personal data, active consents, and processing events.
             </p>
           </div>
-          <button className="btn btn-primary" onClick={handleDownload} disabled={downloading} style={{ width: 'auto', whiteSpace: 'nowrap' }}>
+          <button className="btn btn-primary btn-sm" onClick={handleDownload} disabled={downloading} style={{ width: 'auto', whiteSpace: 'nowrap' }}>
             {downloading ? 'Exporting...' : 'Download My Data (JSON)'}
           </button>
         </div>
@@ -90,11 +90,11 @@ export default function PrivacyRights() {
 
       {/* SECTION 12: ERASURE & CORRECTION */}
       <div className="card" style={{ marginBottom: '1.5rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
             <span className="badge badge-yellow">DPDPA Section 12</span>
             <h3 style={{ margin: '6px 0' }}>Right to Correction & Erasure</h3>
-            <p style={{ fontSize: '0.85rem', color: '#666' }}>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
               Update inaccurate personal details or request permanent erasure of your account.
             </p>
           </div>
@@ -109,7 +109,7 @@ export default function PrivacyRights() {
       <div className="card" style={{ marginBottom: '1.5rem' }}>
         <span className="badge badge-red">DPDPA Section 13</span>
         <h3 style={{ margin: '6px 0' }}>Right of Grievance Redressal</h3>
-        <p style={{ fontSize: '0.85rem', color: '#666', marginBottom: '1rem' }}>
+        <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
           Submit a privacy or data protection concern directly to our Grievance Redressal Officer (7 business days response window).
         </p>
         <form onSubmit={handleGrievance}>
@@ -118,7 +118,6 @@ export default function PrivacyRights() {
             <select
               value={grievance.category}
               onChange={e => setGrievance({ ...grievance, category: e.target.value })}
-              style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #ddd' }}
             >
               <option value="DATA_EXPOSURE">Unauthorized Personal Data Exposure</option>
               <option value="PURPOSE_VIOLATION">Processing Beyond Declared Purpose</option>
@@ -134,7 +133,6 @@ export default function PrivacyRights() {
               onChange={e => setGrievance({ ...grievance, complaintDetails: e.target.value })}
               rows={3}
               placeholder="Describe your privacy concern or observed compliance discrepancy..."
-              style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '0.9rem' }}
               required
             />
           </div>

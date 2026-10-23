@@ -53,10 +53,10 @@ export default function Profile() {
 
       <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginBottom: '1.5rem' }}>
         <div style={{
-          width: '56px', height: '56px', borderRadius: '50%',
-          background: 'linear-gradient(135deg, #4F46E5, #818CF8)',
-          color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '1.4rem', fontWeight: '800', flexShrink: 0
+          width: '52px', height: '52px', borderRadius: '50%',
+          background: '#EFF6FF', border: '1px solid #BFDBFE',
+          color: '#1D4ED8', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: '1.25rem', fontWeight: '700', flexShrink: 0
         }}>
           {profile?.fullName?.charAt(0)?.toUpperCase() || 'U'}
         </div>

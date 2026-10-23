@@ -149,7 +149,7 @@ export default function Consents() {
                 <span className={`consent-status status-${c.status}`}>{c.status}</span>
               </div>
 
-              <div style={{ fontSize: '0.75rem', color: '#4F46E5', fontWeight: '600', marginBottom: '6px' }}>
+              <div style={{ fontSize: '0.75rem', color: '#2563EB', fontWeight: '600', marginBottom: '6px' }}>
                 Statutory Reference: {meta.section}
               </div>
 

@@ -52,7 +52,6 @@ export default function Deletion() {
               onChange={e => setReason(e.target.value)}
               placeholder="Reason for deletion request..."
               rows={3}
-              style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '0.9rem' }}
             />
           </div>
           <button className="btn btn-danger" type="submit" disabled={loading} style={{ width: 'auto', padding: '10px 28px' }}>

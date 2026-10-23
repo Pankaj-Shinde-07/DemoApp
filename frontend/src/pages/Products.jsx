@@ -67,11 +67,11 @@ export default function Products() {
           <div className="product-card" key={p.id}>
             <span className="category">{p.category}</span>
             <h4>{p.name}</h4>
-            <p style={{ fontSize: '0.82rem', color: '#666' }}>{p.description}</p>
+            <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>{p.description}</p>
             <span className="price">₹{parseFloat(p.price).toFixed(2)}</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
               <button className="btn btn-secondary btn-sm" onClick={() => removeFromCart(p.id)}>−</button>
-              <span style={{ minWidth: '24px', textAlign: 'center' }}>{cart[p.id] || 0}</span>
+              <span style={{ minWidth: '24px', textAlign: 'center', fontWeight: 600 }}>{cart[p.id] || 0}</span>
               <button className="btn btn-primary btn-sm" style={{ width: 'auto' }} onClick={() => addToCart(p.id)}>+</button>
             </div>
           </div>
@@ -79,19 +79,19 @@ export default function Products() {
       </div>
 
       {cartCount > 0 && (
-        <div className="card" style={{ marginTop: '1.5rem' }}>
-          <h3>Cart ({cartCount} item{cartCount > 1 ? 's' : ''})</h3>
+        <div className="card" style={{ marginTop: '1.5rem', maxWidth: '480px' }}>
+          <h3>Cart Summary ({cartCount} item{cartCount > 1 ? 's' : ''})</h3>
           {Object.entries(cart).map(([id, qty]) => {
             const p = products.find(x => x.id === parseInt(id));
             return p ? (
-              <div key={id} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid #eee' }}>
+              <div key={id} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid var(--border-subtle)', fontSize: '0.88rem' }}>
                 <span>{p.name} × {qty}</span>
-                <span>₹{(parseFloat(p.price) * qty).toFixed(2)}</span>
+                <span style={{ fontWeight: 600 }}>₹{(parseFloat(p.price) * qty).toFixed(2)}</span>
               </div>
             ) : null;
           })}
-          <button className="btn btn-success" style={{ marginTop: '1rem', width: 'auto', padding: '10px 28px' }} onClick={placeOrder} disabled={ordering}>
-            {ordering ? 'Placing Order...' : 'Place Order'}
+          <button className="btn btn-primary" style={{ marginTop: '1.25rem', width: '100%', padding: '10px 24px' }} onClick={placeOrder} disabled={ordering}>
+            {ordering ? 'Placing Order...' : 'Confirm & Place Order'}
           </button>
         </div>
       )}

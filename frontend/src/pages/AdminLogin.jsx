@@ -31,8 +31,37 @@ export default function AdminLogin() {
         <h2>Admin Panel</h2>
         <p className="subtitle">DemoApp Administration</p>
         {error && <div className="alert alert-error">{error}</div>}
-        <div className="alert alert-info">
-          Credentials: <strong>admin</strong> / <strong>password</strong>
+        <div style={{
+          background: '#F8FAFC',
+          border: '1px solid #E2E8F0',
+          borderRadius: '8px',
+          padding: '10px 14px',
+          marginBottom: '1.25rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          fontSize: '0.82rem'
+        }}>
+          <div>
+            <span style={{ color: '#64748B' }}>Admin Account:</span>{' '}
+            <strong style={{ color: '#0F172A' }}>admin</strong> / <strong style={{ color: '#0F172A' }}>Admin@123</strong>
+          </div>
+          <button
+            type="button"
+            onClick={() => setForm({ username: 'admin', password: 'Admin@123' })}
+            style={{
+              background: '#FFFFFF',
+              border: '1px solid #CBD5E1',
+              color: '#2563EB',
+              borderRadius: '5px',
+              padding: '3px 8px',
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              cursor: 'pointer'
+            }}
+          >
+            Auto-fill
+          </button>
         </div>
         <form onSubmit={submit}>
           <div className="form-group">
@@ -41,10 +70,10 @@ export default function AdminLogin() {
           </div>
           <div className="form-group">
             <label>Password</label>
-            <input type="password" name="password" value={form.password} onChange={handle} placeholder="password" required />
+            <input type="password" name="password" value={form.password} onChange={handle} placeholder="Admin@123" required />
           </div>
-          <button className="btn btn-primary" type="submit" disabled={loading}>
-            {loading ? 'Logging in...' : 'Admin Login'}
+          <button className="btn btn-primary" type="submit" disabled={loading} style={{ width: '100%', marginTop: '0.5rem' }}>
+            {loading ? 'Logging in...' : 'Sign In as Admin'}
           </button>
         </form>
       </div>
