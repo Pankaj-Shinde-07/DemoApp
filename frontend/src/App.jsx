@@ -29,7 +29,7 @@ function Navbar() {
   return (
     <nav className="navbar">
       <Link to="/" className="navbar-brand">
-        <div className="navbar-brand-logo">🛡️</div>
+        <div className="navbar-brand-logo" style={{fontWeight:"bold",fontSize:"1.1rem"}}>DP</div>
         <span>DemoApp</span>
         <span className="navbar-brand-badge">DPDPA Target</span>
       </Link>

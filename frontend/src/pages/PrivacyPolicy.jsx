@@ -26,7 +26,7 @@ export default function PrivacyPolicy() {
       </div>
 
       <div className="test-banner">
-        <strong>📋 Itemized Privacy Notice (DPDPA Statutory Standard):</strong>
+        <strong>Itemized Privacy Notice (DPDPA Statutory Standard):</strong>
         Under DPDP Rules 2025, Data Fiduciaries must present clear, standalone notices itemizing the personal data
         collected, specified purposes, retention schedules, and principal rights. External auditors (PrivGuard) parse this notice against actual runtime behavior.
       </div>

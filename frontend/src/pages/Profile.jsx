@@ -43,7 +43,7 @@ export default function Profile() {
       </div>
 
       <div className="test-banner">
-        <strong>⚠ DPDPA Test Scenario Active</strong>
+        <strong>DPDPA Test Scenario Active</strong>
         This profile API returns all personal data fields including dateOfBirth, mobileNumber and address.
         The external DPDPA Audit Platform will detect this as excessive data exposure (RULE-006).
       </div>
@@ -76,7 +76,7 @@ export default function Profile() {
           <h3 style={{ margin: 0, border: 'none', padding: 0 }}>Personal Information</h3>
           {!editing && (
             <button className="btn btn-secondary btn-sm" onClick={() => setEditing(true)}>
-              ✏️ Edit Details
+              Edit Details
             </button>
           )}
         </div>

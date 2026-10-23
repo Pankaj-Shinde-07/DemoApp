@@ -102,7 +102,7 @@ export default function Register() {
           {/* DPDPA STATUTORY CONSENT SECTION */}
           <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', padding: '14px', borderRadius: '8px', marginBottom: '1.25rem' }}>
             <div style={{ fontSize: '0.85rem', fontWeight: '700', color: '#1E1B4B', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span>🛡️</span> DPDPA Statutory Privacy & Consent Declarations
+              DPDPA Statutory Privacy & Consent Declarations
             </div>
 
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', marginBottom: '8px' }}>

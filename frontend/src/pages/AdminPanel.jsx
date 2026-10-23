@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiRequest } from '../api/api';
 
-const TABS = ['Users', 'Orders', 'Consents', 'Events', 'Audit Logs', 'Deletion Requests', '🧪 DPDPA Testbed'];
+const TABS = ['Users', 'Orders', 'Consents', 'Events', 'Audit Logs', 'Deletion Requests', 'DPDPA Testbed'];
 
 const adminApi = (endpoint, token) => apiRequest(endpoint, 'GET', null, token);
 
@@ -23,7 +23,7 @@ export default function AdminPanel() {
   };
 
   const fetchTab = async (t) => {
-    if (t === '🧪 DPDPA Testbed') {
+    if (t === 'DPDPA Testbed') {
       setLoading(false);
       return;
     }
@@ -231,7 +231,7 @@ export default function AdminPanel() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
         <div className="card" style={{ borderLeft: '4px solid #C43232', background: '#fafafa' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span className="badge badge-red">TEST-001 • HIGH</span>
+            <span className="badge badge-red">TEST-001 | HIGH</span>
             <span style={{ fontSize: '0.8rem', color: '#888' }}>RULE-001</span>
           </div>
           <h4 style={{ margin: '8px 0 4px 0' }}>Personal Data in Logs</h4>
@@ -239,13 +239,13 @@ export default function AdminPanel() {
             Logs raw user name, email, and mobile into unmasked application log files and DB table.
           </p>
           <button className="btn btn-primary btn-sm" onClick={() => triggerTest('TEST-001')} disabled={triggering}>
-            {triggering ? 'Triggering...' : '🚀 Fire TEST-001'}
+            {triggering ? 'Triggering...' : 'Fire TEST-001'}
           </button>
         </div>
 
         <div className="card" style={{ borderLeft: '4px solid #B54708', background: '#fafafa' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span className="badge badge-yellow">TEST-002 • HIGH</span>
+            <span className="badge badge-yellow">TEST-002 | HIGH</span>
             <span style={{ fontSize: '0.8rem', color: '#888' }}>RULE-006</span>
           </div>
           <h4 style={{ margin: '8px 0 4px 0' }}>Excessive API Data Exposure</h4>
@@ -253,13 +253,13 @@ export default function AdminPanel() {
             Profile endpoint returns excessive fields (DOB, address, gender, postal code).
           </p>
           <button className="btn btn-primary btn-sm" onClick={() => triggerTest('TEST-002')} disabled={triggering}>
-            {triggering ? 'Triggering...' : '🚀 Fire TEST-002'}
+            {triggering ? 'Triggering...' : 'Fire TEST-002'}
           </button>
         </div>
 
         <div className="card" style={{ borderLeft: '4px solid #5B21B6', background: '#fafafa' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span className="badge badge-red" style={{ background: '#5B21B6' }}>TEST-003 • CRITICAL</span>
+            <span className="badge badge-red" style={{ background: '#5B21B6' }}>TEST-003 | CRITICAL</span>
             <span style={{ fontSize: '0.8rem', color: '#888' }}>RULE-005</span>
           </div>
           <h4 style={{ margin: '8px 0 4px 0' }}>Consent Enforcement Failure</h4>
@@ -267,13 +267,13 @@ export default function AdminPanel() {
             Emits a MARKETING_PROCESSING event after a user executes CONSENT_WITHDRAWN.
           </p>
           <button className="btn btn-primary btn-sm" onClick={() => triggerTest('TEST-003')} disabled={triggering}>
-            {triggering ? 'Triggering...' : '🚀 Fire TEST-003'}
+            {triggering ? 'Triggering...' : 'Fire TEST-003'}
           </button>
         </div>
 
         <div className="card" style={{ borderLeft: '4px solid #B54708', background: '#fafafa' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span className="badge badge-yellow">TEST-004 • HIGH</span>
+            <span className="badge badge-yellow">TEST-004 | HIGH</span>
             <span style={{ fontSize: '0.8rem', color: '#888' }}>RULE-003</span>
           </div>
           <h4 style={{ margin: '8px 0 4px 0' }}>Purpose-Use Mismatch</h4>
@@ -281,13 +281,13 @@ export default function AdminPanel() {
             Processes mobile number during order flow when declared purpose is strictly OTP verification.
           </p>
           <button className="btn btn-primary btn-sm" onClick={() => triggerTest('TEST-004')} disabled={triggering}>
-            {triggering ? 'Triggering...' : '🚀 Fire TEST-004'}
+            {triggering ? 'Triggering...' : 'Fire TEST-004'}
           </button>
         </div>
 
         <div className="card" style={{ borderLeft: '4px solid #18794E', background: '#fafafa' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span className="badge badge-green">TEST-005 • MEDIUM</span>
+            <span className="badge badge-green">TEST-005 | MEDIUM</span>
             <span style={{ fontSize: '0.8rem', color: '#888' }}>RULE-007</span>
           </div>
           <h4 style={{ margin: '8px 0 4px 0' }}>Retention Window Exceeded</h4>
@@ -295,13 +295,13 @@ export default function AdminPanel() {
             Creates a 410-day-old marketing processing record (declared retention is 365 days).
           </p>
           <button className="btn btn-primary btn-sm" onClick={() => triggerTest('TEST-005')} disabled={triggering}>
-            {triggering ? 'Triggering...' : '🚀 Fire TEST-005'}
+            {triggering ? 'Triggering...' : 'Fire TEST-005'}
           </button>
         </div>
 
         <div className="card" style={{ borderLeft: '4px solid #5B21B6', background: '#fafafa' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span className="badge badge-red" style={{ background: '#5B21B6' }}>TEST-006 • CRITICAL</span>
+            <span className="badge badge-red" style={{ background: '#5B21B6' }}>TEST-006 | CRITICAL</span>
             <span style={{ fontSize: '0.8rem', color: '#888' }}>RULE-001 (Sec 8)</span>
           </div>
           <h4 style={{ margin: '8px 0 4px 0' }}>PAN Card / Sensitive PII Logged</h4>
@@ -309,13 +309,13 @@ export default function AdminPanel() {
             Plain-text PAN identity card number is logged during identity/KYC processing.
           </p>
           <button className="btn btn-primary btn-sm" onClick={() => triggerTest('TEST-006')} disabled={triggering}>
-            {triggering ? 'Triggering...' : '🚀 Fire TEST-006'}
+            {triggering ? 'Triggering...' : 'Fire TEST-006'}
           </button>
         </div>
 
         <div className="card" style={{ borderLeft: '4px solid #18794E', background: '#fafafa' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span className="badge badge-blue">TEST-007 • MEDIUM</span>
+            <span className="badge badge-blue">TEST-007 | MEDIUM</span>
             <span style={{ fontSize: '0.8rem', color: '#888' }}>RULE-010 (Sec 12)</span>
           </div>
           <h4 style={{ margin: '8px 0 4px 0' }}>Data Principal Right to Erasure</h4>
@@ -323,13 +323,13 @@ export default function AdminPanel() {
             Submits a user deletion/erasure request under DPDPA Section 12 for compliance verification.
           </p>
           <button className="btn btn-primary btn-sm" onClick={() => triggerTest('TEST-007')} disabled={triggering}>
-            {triggering ? 'Triggering...' : '🚀 Fire TEST-007'}
+            {triggering ? 'Triggering...' : 'Fire TEST-007'}
           </button>
         </div>
 
         <div className="card" style={{ borderLeft: '4px solid #DC2626', background: '#fafafa' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span className="badge badge-red" style={{ background: '#DC2626' }}>TEST-008 • CRITICAL</span>
+            <span className="badge badge-red" style={{ background: '#DC2626' }}>TEST-008 | CRITICAL</span>
             <span style={{ fontSize: '0.8rem', color: '#888' }}>PRIVACY DRIFT</span>
           </div>
           <h4 style={{ margin: '8px 0 4px 0' }}>Architectural Privacy Drift</h4>
@@ -337,13 +337,13 @@ export default function AdminPanel() {
             Reroutes auth mobile numbers to unapproved marketing-service violating Behavior Contracts.
           </p>
           <button className="btn btn-primary btn-sm" onClick={() => triggerTest('TEST-008')} disabled={triggering}>
-            {triggering ? 'Triggering...' : '🚀 Fire TEST-008'}
+            {triggering ? 'Triggering...' : 'Fire TEST-008'}
           </button>
         </div>
 
         <div className="card" style={{ borderLeft: '4px solid #7F1D1D', background: '#fafafa' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span className="badge badge-red" style={{ background: '#7F1D1D' }}>TEST-009 • CRITICAL</span>
+            <span className="badge badge-red" style={{ background: '#7F1D1D' }}>TEST-009 | CRITICAL</span>
             <span style={{ fontSize: '0.8rem', color: '#888' }}>SECRET LEAK</span>
           </div>
           <h4 style={{ margin: '8px 0 4px 0' }}>High-Entropy API Key / Token Leak</h4>
@@ -351,7 +351,7 @@ export default function AdminPanel() {
             Logs live high-entropy Stripe API credentials into application webhook logs.
           </p>
           <button className="btn btn-primary btn-sm" onClick={() => triggerTest('TEST-009')} disabled={triggering}>
-            {triggering ? 'Triggering...' : '🚀 Fire TEST-009'}
+            {triggering ? 'Triggering...' : 'Fire TEST-009'}
           </button>
         </div>
       </div>
@@ -359,7 +359,7 @@ export default function AdminPanel() {
   );
 
   const renderContent = () => {
-    if (tab === '🧪 DPDPA Testbed')  return renderTestbed();
+    if (tab === 'DPDPA Testbed')  return renderTestbed();
     if (loading) return <div className="loading">Loading...</div>;
     if (error)   return <div className="alert alert-error">{error}</div>;
     const d = data[tab];
@@ -398,14 +398,14 @@ export default function AdminPanel() {
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
           <button className="btn btn-secondary btn-sm" onClick={resetSeeds} disabled={resetting}>
-            {resetting ? 'Resetting...' : '🔄 Reset Seeds'}
+            {resetting ? 'Resetting...' : 'Reset Seeds'}
           </button>
           <button className="btn btn-danger btn-sm" onClick={logout}>Logout</button>
         </div>
       </div>
 
       <div className="test-banner">
-        <strong>⚠ DemoApp Admin — Evidence View for DPDPA Audit Platform</strong>
+        <strong>DemoApp Admin — Evidence View for DPDPA Audit Platform</strong>
         This panel shows all personal data, events, logs and consent records generated by DemoApp.
         The external DPDPA Audit Platform ingests this evidence to detect compliance risks.
       </div>

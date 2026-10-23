@@ -34,7 +34,7 @@ export default function Orders() {
       </div>
 
       <div className="test-banner">
-        <strong>⚠ DPDPA Test Scenario Active</strong>
+        <strong>DPDPA Test Scenario Active</strong>
         Order events include mobileNumber even though its declared purpose is OTP verification only.
         This is a PURPOSE_MISMATCH test case for the external DPDPA Audit Platform.
       </div>

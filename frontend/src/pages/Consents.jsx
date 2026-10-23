@@ -117,13 +117,13 @@ export default function Consents() {
             ✕ Reject All Optional
           </button>
           <Link to="/privacy-policy" className="btn btn-secondary btn-sm" style={{ textDecoration: 'none' }}>
-            📄 View Full Notice
+            View Full Notice
           </Link>
         </div>
       </div>
 
       <div className="test-banner">
-        <strong>🛡️ DPDPA Section 6(4) Compliance Gate:</strong>
+        <strong>DPDPA Section 6(4) Compliance Gate:</strong>
         As a Data Principal, you have the statutory right to give, modify, or withdraw consent at any time.
         Withdrawing <code>MARKETING</code> consent emits a statutory <code>CONSENT_WITHDRAWN</code> event to the PrivGuard Auditor.
       </div>

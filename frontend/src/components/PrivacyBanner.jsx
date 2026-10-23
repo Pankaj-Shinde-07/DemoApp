@@ -73,7 +73,7 @@ export default function PrivacyBanner() {
         }}>
           <div style={{ maxWidth: '780px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-              <span style={{ fontSize: '1.1rem' }}>🛡️</span>
+              
               <strong style={{ fontSize: '0.95rem', color: '#FFFFFF' }}>DPDPA Statutory Privacy & Consent Notice</strong>
               <span style={{ background: '#312E81', color: '#C7D2FE', fontSize: '0.7rem', padding: '2px 6px', borderRadius: '4px', fontWeight: 600 }}>
                 DPDP Rules 2025
@@ -112,7 +112,7 @@ export default function PrivacyBanner() {
                 padding: '8px 14px', borderRadius: '6px', fontSize: '0.85rem', cursor: 'pointer'
               }}
             >
-              ⚙ Customize
+              Customize
             </button>
           </div>
         </div>
@@ -123,7 +123,7 @@ export default function PrivacyBanner() {
         <div className="modal-overlay" onClick={() => setShowModal(false)} style={{ zIndex: 9999 }}>
           <div className="modal-card" onClick={e => e.stopPropagation()} style={{ maxWidth: '600px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid #E2E8F0', paddingBottom: '0.75rem' }}>
-              <h3 style={{ margin: 0, color: '#0F172A' }}>⚙ Privacy & Consent Preferences</h3>
+              <h3 style={{ margin: 0, color: '#0F172A' }}>Privacy & Consent Preferences</h3>
               <button className="modal-close" onClick={() => setShowModal(false)}>✕</button>
             </div>
 

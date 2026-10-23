@@ -83,7 +83,7 @@ export default function PrivacyRights() {
             </p>
           </div>
           <button className="btn btn-primary" onClick={handleDownload} disabled={downloading} style={{ width: 'auto', whiteSpace: 'nowrap' }}>
-            {downloading ? 'Exporting...' : '📥 Download My Data (JSON)'}
+            {downloading ? 'Exporting...' : 'Download My Data (JSON)'}
           </button>
         </div>
       </div>
